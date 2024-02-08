@@ -30,21 +30,21 @@ namespace ITB2203Application.Controllers
         [HttpGet("{id}")]
         public ActionResult<TextReader> GetTest(int id)
         {
-            var test = _context.Tests!.Find(id);
+            var attendee = _context.Attendees!.Find(id);
 
-            if (test == null)
+            if (attendee == null)
             {
                 return NotFound();
             }
 
-            return Ok(test);
+            return Ok(attendee);
         }
 
         [HttpPut("{id}")]
         public IActionResult PutTest(int id, Attendee attendee)
         {
-            var dbTest = _context.Tests!.AsNoTracking().FirstOrDefault(x => x.Id == attendee.Id);
-            if (id != attendee.Id || dbTest == null)
+            var dbAttendee = _context.Attendees!.AsNoTracking().FirstOrDefault(x => x.Id == attendee.Id);
+            if (id != attendee.Id || dbAttendee == null)
             {
                 return NotFound();
             }
@@ -56,9 +56,9 @@ namespace ITB2203Application.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Test> PostTest(Attendee attendee)
+        public ActionResult<Attendee> PostTest(Attendee attendee)
         {
-            var dbExercise = _context.Tests!.Find(attendee.Id);
+            var dbExercise = _context.Attendees!.Find(attendee.Id);
             if (dbExercise == null)
             {
                 _context.Add(attendee);
@@ -75,13 +75,13 @@ namespace ITB2203Application.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteTest(int id)
         {
-            var test = _context.Tests!.Find(id);
-            if (test == null)
+            var attendee = _context.Attendees!.Find(id);
+            if (attendee == null)
             {
                 return NotFound();
             }
 
-            _context.Remove(test);
+            _context.Remove(attendee);
             _context.SaveChanges();
 
             return NoContent();
