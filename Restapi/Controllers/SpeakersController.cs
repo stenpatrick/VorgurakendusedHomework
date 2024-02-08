@@ -19,7 +19,7 @@ namespace ITB2203Application.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Speaker>> GetTests(string? name = null)
         {
-            var query = _context.Tests!.AsQueryable();
+            var query = _context.Speakers!.AsQueryable();
 
             if (name != null)
                 query = query.Where(x => x.Name != null && x.Name.ToUpper().Contains(name.ToUpper()));

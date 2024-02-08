@@ -19,7 +19,7 @@ namespace ITB2203Application.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Event>> GetTests(string? name = null)
         {
-            var query = _context.Tests!.AsQueryable();
+            var query = _context.Events!.AsQueryable();
 
             if (name != null)
                 query = query.Where(x => x.Name != null && x.Name.ToUpper().Contains(name.ToUpper()));
@@ -58,13 +58,13 @@ namespace ITB2203Application.Controllers
         [HttpPost]
         public ActionResult<Test> PostTest(Event @event)
         {
-            var dbExercise = _context.Tests!.Find(speaker.Id);
+            var dbExercise = _context.Tests!.Find(@event.Id);
             if (dbExercise == null)
             {
-                _context.Add(speaker);
+                _context.Add(@event);
                 _context.SaveChanges();
 
-                return CreatedAtAction(nameof(GetTest), new { Id = speaker.Id }, speaker);
+                return CreatedAtAction(nameof(GetTest), new { Id = @event.Id }, @event);
             }
             else
             {
