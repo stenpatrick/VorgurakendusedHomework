@@ -63,6 +63,8 @@ namespace ITB2203Application.Controllers
         [HttpPost]
         public ActionResult<Test> PostTest(Attendee attendee)
         {
+
+
             if (!attendee.Email.Contains("@"))
             {
                 return BadRequest("Invalid email format. Email must contain '@' symbol.");
@@ -85,7 +87,11 @@ namespace ITB2203Application.Controllers
             {
                 return BadRequest("Email already exists.");
             }
-
+            var associatedEvent = _context.Events.FirstOrDefault(s => s.Id == Event.Id);
+            if (attendee.RegistrationTime > associatedEvent.Date)
+            {
+                return BadRequest("Registration time cannot be later than event time.");
+            }
             _context.Attendees.Add(attendee);
             _context.SaveChanges();
 

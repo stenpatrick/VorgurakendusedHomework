@@ -57,18 +57,17 @@ public class EventsController : ControllerBase
     [HttpPost]
     public ActionResult<Test> PostTest(Event @event)
     {
-        var dbExercise = _context.Events!.Find(@event.Id);
-        if (dbExercise == null)
-        {
-            _context.Add(@event);
-            _context.SaveChanges();
 
-            return CreatedAtAction(nameof(GetTest), new { Id = @event.Id }, @event);
-        }
-        else
+        var dbEventId = _context.Events.Find(@event.Id);
+
+        if (dbEventId != null)
         {
-            return Conflict();
+            return Conflict("Event with the same ID already exists.");
         }
+        _context.Events.Add(@event);
+        _context.SaveChanges();
+
+        return CreatedAtAction(nameof(GetTest), new { Id = @event.Id }, @event);
     }
 
     [HttpDelete("{id}")]
