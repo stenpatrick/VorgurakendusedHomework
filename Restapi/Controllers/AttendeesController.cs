@@ -2,6 +2,7 @@ using ITB2203Application.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ITB2203Application.Controllers
 {
@@ -36,8 +37,12 @@ namespace ITB2203Application.Controllers
             {
                 return NotFound();
             }
+            if (!attendee.Email.Contains("@"))
+            {
+                return BadRequest();
+            }
 
-            return Ok(attendee);
+                return Ok(attendee);
         }
 
         [HttpPut("{id}")]
@@ -56,20 +61,35 @@ namespace ITB2203Application.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Attendee> PostTest(Attendee attendee)
+        public ActionResult<Test> PostTest(Attendee attendee)
         {
-            var dbExercise = _context.Attendees!.Find(attendee.Id);
-            if (dbExercise == null)
+            if (!attendee.Email.Contains("@"))
             {
-                _context.Add(attendee);
-                _context.SaveChanges();
+                return BadRequest("Invalid email format. Email must contain '@' symbol.");
+            }
 
-                return CreatedAtAction(nameof(GetTest), new { Id = attendee.Id }, attendee);
-            }
-            else
+            var existingSpeaker = _context.Speakers.FirstOrDefault(s => s.Email == attendee.Email);
+
+            if (existingSpeaker != null)
             {
-                return Conflict();
+                return BadRequest("Speaker with the same email already exists.");
             }
+
+            var dbAttendeeId = _context.Attendees.Find(attendee.Id);
+            if (dbAttendeeId != null)
+            {
+                return Conflict("Attendee with the same ID already exists.");
+            }
+            var existingAttendee = _context.Attendees.FirstOrDefault(s => s.Email == attendee.Email);
+            if (existingAttendee != null)
+            {
+                return BadRequest("Email already exists.");
+            }
+
+            _context.Attendees.Add(attendee);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetTest), new { Id = attendee.Id }, attendee);
         }
 
         [HttpDelete("{id}")]

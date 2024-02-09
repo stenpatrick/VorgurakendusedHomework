@@ -29,14 +29,17 @@ public class SpeakersController : ControllerBase
     [HttpGet("{id}")]
     public ActionResult<TextReader> GetTest(int id)
     {
-        var test = _context.Speakers!.Find(id);
+        var speaker = _context.Speakers!.Find(id);
 
-        if (test == null)
+        if (speaker == null)
         {
-            return NotFound();
+            return BadRequest();
         }
-
-        return Ok(test);
+        if (speaker.Email != null && !speaker.Email.Contains("@"))
+        {
+            return BadRequest();
+        }
+        return Ok(speaker);
     }
 
     [HttpPut("{id}")]
@@ -57,18 +60,22 @@ public class SpeakersController : ControllerBase
     [HttpPost]
     public ActionResult<Test> PostTest(Speaker speaker)
     {
-        var dbExercise = _context.Speakers!.Find(speaker.Id);
-        if (dbExercise == null)
+        if (!speaker.Email.Contains("@"))
         {
-            _context.Add(speaker);
-            _context.SaveChanges();
+            return BadRequest("Invalid email format. Email must contain '@' symbol.");
+        }
 
-            return CreatedAtAction(nameof(GetTest), new { Id = speaker.Id }, speaker);
-        }
-        else
+        var dbSpeaker = _context.Speakers.Find(speaker.Id);
+
+        if (dbSpeaker != null)
         {
-            return Conflict();
+            return Conflict("Speaker with the same ID already exists.");
         }
+
+        _context.Speakers.Add(speaker);
+        _context.SaveChanges();
+
+        return CreatedAtAction(nameof(GetTest), new { Id = speaker.Id }, speaker);
     }
 
     [HttpDelete("{id}")]
