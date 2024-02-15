@@ -18,18 +18,25 @@ namespace ITB2203Application.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Attendee>> GetTests(string? name = null)
+        public ActionResult<IEnumerable<Attendee>> GetAttendees(string? name = null, int? daysBeforeEvent = null)
         {
             var query = _context.Attendees!.AsQueryable();
 
             if (name != null)
+            {
                 query = query.Where(x => x.Name != null && x.Name.ToUpper().Contains(name.ToUpper()));
+            }
+            if (daysBeforeEvent is not null)
+            {
+                query = query.Where(x=> 
+                (_context!.Events!.FirstOrDefault((e) => e.Id == x.EventId)!.Date!.Value - x.RegistrationTime).TotalDays > daysBeforeEvent);
+            }
 
             return query.ToList();
         }
 
         [HttpGet("{id}")]
-        public ActionResult<TextReader> GetTest(int id)
+        public ActionResult<TextReader> GetAttendee(int id)
         {
             var attendee = _context.Attendees!.Find(id);
 
@@ -37,16 +44,18 @@ namespace ITB2203Application.Controllers
             {
                 return NotFound();
             }
+
             if (!attendee.Email.Contains("@"))
             {
                 return BadRequest();
             }
 
-                return Ok(attendee);
+
+            return Ok(attendee);
         }
 
         [HttpPut("{id}")]
-        public IActionResult PutTest(int id, Attendee attendee)
+        public IActionResult PutAttendee(int id, Attendee attendee)
         {
             var dbAttendee = _context.Attendees!.AsNoTracking().FirstOrDefault(x => x.Id == attendee.Id);
             if (id != attendee.Id || dbAttendee == null)
@@ -61,7 +70,7 @@ namespace ITB2203Application.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Test> PostTest(Attendee attendee)
+        public ActionResult<Attendee> PostAttendee(Attendee attendee)
         {
 
 
@@ -87,7 +96,11 @@ namespace ITB2203Application.Controllers
             {
                 return BadRequest("Email already exists.");
             }
-            var associatedEvent = _context.Events.FirstOrDefault(s => s.Id == Event.Id);
+            var associatedEvent = _context!.Events?.FirstOrDefault(s => s.Id == attendee.EventId);
+            if (associatedEvent == null)
+            {
+                return NotFound("Return not found.");
+            }
             if (attendee.RegistrationTime > associatedEvent.Date)
             {
                 return BadRequest("Registration time cannot be later than event time.");
@@ -95,11 +108,11 @@ namespace ITB2203Application.Controllers
             _context.Attendees.Add(attendee);
             _context.SaveChanges();
 
-            return CreatedAtAction(nameof(GetTest), new { Id = attendee.Id }, attendee);
+            return CreatedAtAction(nameof(GetAttendee), new { Id = attendee.Id }, attendee);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteTest(int id)
+        public IActionResult DeleteAttendee(int id)
         {
             var attendee = _context.Attendees!.Find(id);
             if (attendee == null)

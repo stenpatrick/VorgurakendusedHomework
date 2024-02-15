@@ -16,7 +16,7 @@ public class SpeakersController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Speaker>> GetTests(string? name = null)
+    public ActionResult<IEnumerable<Speaker>> GetSpeakers(string? name = null)
     {
         var query = _context.Speakers!.AsQueryable();
 
@@ -27,7 +27,7 @@ public class SpeakersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public ActionResult<TextReader> GetTest(int id)
+    public ActionResult<TextReader> GetSpeaker(int id)
     {
         var speaker = _context.Speakers!.Find(id);
 
@@ -43,7 +43,7 @@ public class SpeakersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public IActionResult PutTest(int id, Speaker speaker)
+    public IActionResult PutSpeaker(int id, Speaker speaker)
     {
         var dbSpeaker = _context.Speakers!.AsNoTracking().FirstOrDefault(x => x.Id == speaker.Id);
         if (id != speaker.Id || dbSpeaker == null)
@@ -58,7 +58,7 @@ public class SpeakersController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Test> PostTest(Speaker speaker)
+    public ActionResult<Speaker> PostSpeaker(Speaker speaker)
     {
         if (!speaker.Email.Contains("@"))
         {
@@ -75,11 +75,11 @@ public class SpeakersController : ControllerBase
         _context.Speakers.Add(speaker);
         _context.SaveChanges();
 
-        return CreatedAtAction(nameof(GetTest), new { Id = speaker.Id }, speaker);
+        return CreatedAtAction(nameof(GetSpeaker), new { Id = speaker.Id }, speaker);
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteTest(int id)
+    public IActionResult DeleteSpeaker(int id)
     {
         var speaker = _context.Speakers!.Find(id);
         if (speaker == null)

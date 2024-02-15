@@ -16,7 +16,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Event>> GetTests(string? name = null)
+    public ActionResult<IEnumerable<Event>> GetEvents(string? name = null)
     {
         var query = _context.Events!.AsQueryable();
 
@@ -27,20 +27,20 @@ public class EventsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public ActionResult<TextReader> GetTest(int id)
+    public ActionResult<TextReader> GetEvent(int id)
     {
-        var test = _context.Events!.Find(id);
+        var Event = _context.Events!.Find(id);
 
-        if (test == null)
+        if (Event == null)
         {
             return NotFound();
         }
 
-        return Ok(test);
+        return Ok(Event);
     }
 
     [HttpPut("{id}")]
-    public IActionResult PutTest(int id, Event @event)
+    public IActionResult PutEvent(int id, Event @event)
     {
         var dbEvent = _context.Events!.AsNoTracking().FirstOrDefault(x => x.Id == @event.Id);
         if (id != @event.Id || dbEvent == null)
@@ -55,23 +55,32 @@ public class EventsController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Test> PostTest(Event @event)
+    public ActionResult<Event> PostEvent(Event @event)
     {
-
+        if (@event == null)
+        {
+            return BadRequest(new { error = "Event object is null." });
+        }
+        //var dbEventSpeakerId = _context.Events.Find(@event.SpeakerId);
+        //if (dbEventSpeakerId == null)
+        //{
+        //    return Conflict(new { error = "Event with the same ID already exists." });
+        //}
         var dbEventId = _context.Events.Find(@event.Id);
 
         if (dbEventId != null)
         {
-            return Conflict("Event with the same ID already exists.");
+            return Conflict(new { error = "Event with the same ID already exists." });
         }
+
         _context.Events.Add(@event);
         _context.SaveChanges();
 
-        return CreatedAtAction(nameof(GetTest), new { Id = @event.Id }, @event);
+        return CreatedAtAction(nameof(GetEvent), new { Id = @event.Id }, @event);
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteTest(int id)
+    public IActionResult DeleteEvent(int id)
     {
         var @event = _context.Events!.Find(id);
         if (@event == null)
