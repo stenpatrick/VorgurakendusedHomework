@@ -7,8 +7,17 @@
       <DataTable :value="events" v-if="events.length > 0">
         <Column field="type" header="Nimetus" />
         <Column field="location" header="Asukoht" />
-        <Column field="date" header="Kuupäev" />
-        <Column field="time" header="Kellaaeg" />
+        <Column header="Kuupäev">
+          <template #body="{ data }">
+              {{ formatDateTime(data.date).date }}
+          </template>
+        </Column>
+        <Column header="Kellaaeg">
+          <template #body="{ data }">
+            {{ formatDateTime(data.date).time }}
+          </template>
+        </Column>
+
         <Column v-if="!isAthlete">
           <template #body="{ data }">
             <router-link
@@ -86,6 +95,17 @@ onMounted(() => {
 
 const remove = (event: Event) => {
   eventsStore.deleteEvent(event);
+};
+
+const formatDateTime = (isoString: string) => {
+  const dateTime = new Date(isoString)
+  const timeZone = 'UTC';
+  const optionsDate: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: timeZone};
+  const optionsTime: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: timeZone};
+  return {
+    date: dateTime.toLocaleDateString(undefined, optionsDate),
+    time: dateTime.toLocaleTimeString(undefined, optionsTime)
+  };
 };
 
 </script>

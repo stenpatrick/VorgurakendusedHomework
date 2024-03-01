@@ -1,9 +1,9 @@
 <template>
-  <AddEventForm :event="event" />
+  <UpdateEventForm :event="event" />
 </template>
 
 <script setup lang="ts">
-import AddEventForm from '@/components/AddEventForm.vue';
+import UpdateEventForm from '@/components/UpdateEventForm.vue';
 import { Event } from '@/models/event';
 import { useEventsStore } from '@/stores/eventsStore';
 import { onMounted, ref } from 'vue';

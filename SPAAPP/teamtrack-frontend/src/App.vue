@@ -29,6 +29,7 @@ ul {
   padding: 0;
   overflow: hidden;
   background-color: rgb(17 24 39);
+  color: white
 }
 
 li {
@@ -42,7 +43,7 @@ li:last-child {
 
 li a {
   display: block;
-  color: #E935C1;
+  color: white;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
