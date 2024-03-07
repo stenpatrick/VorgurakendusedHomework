@@ -5,6 +5,8 @@ namespace teamtrack_api.Model;
 public class DataContext: DbContext {
     public DataContext(DbContextOptions<DataContext> options): base(options) {}
     public DbSet<Event>? EventList {get; set;}
+    public DbSet<People>? PeopleList {get; set;}
+    public DbSet<EventPeople>? EventPeopleList {get; set;}
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Event>().Property(p => p.Id).HasIdentityOptions(startValue: 1);
