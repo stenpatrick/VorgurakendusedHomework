@@ -1,37 +1,76 @@
 using Microsoft.AspNetCore.Mvc;
 using teamtrack_api.Model;
+using System.Linq;
 
-namespace teamtrack_api.Controllers;
+namespace teamtrack_api.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class EventPeopleController : ControllerBase
+    {
+        private readonly DataContext _context;
 
-[ApiController] [Route("api/[controller]")] public class EventPeopleController : ControllerBase {
-    private readonly DataContext context;
-    public EventPeopleController(DataContext c)  {
-        context = c;
-    }
-    [HttpGet] public IActionResult GetEventPeople() {
-        return Ok(context.EventPeopleList);
-    }   
-    [HttpPost] public IActionResult Create([FromBody] EventPeople e) {
-        var dbEventPeople = context.EventPeopleList?.Find(e.Id); 
-        if (dbEventPeople == null) {
-            context.EventPeopleList?.Add(e); 
-            context.SaveChanges();
-            return CreatedAtAction(nameof(GetEventPeople), new { e.Id }, e);
+        public EventPeopleController(DataContext context)
+        {
+            _context = context;
         }
-        return Conflict();
-    }
-    [HttpPut("{id}")] public IActionResult Update(int? id, [FromBody] EventPeople e) {
-        if (id != e.Id || !context.EventPeopleList!.Any(e => e.Id == id)) return NotFound();
-        context.Update(e);
-        context.SaveChanges();
+
+        [HttpGet]
+        public IActionResult GetEventPeople()
+        {
+            return Ok(_context.EventPeopleList);
+        }
+
+        [HttpPost]
+        public IActionResult Create([FromBody] EventPeople e)
+        {
+            if (e == null)
+            {
+                return BadRequest("EventPeople object is null");
+            }
+
+            var dbEventPeople = _context.EventPeopleList.FirstOrDefault(ev => ev.Id == e.Id);
+            if (dbEventPeople != null)
+            {
+                return Conflict("EventPeople already exists");
+            }
+
+            _context.EventPeopleList.Add(e);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetEventPeople), new { id = e.Id }, e);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody] EventPeople e)
+        {
+            if (e == null || id != e.Id)
+            {
+                return BadRequest("EventPeople object is null or ID does not match");
+            }
+
+            var dbEventPeople = _context.EventPeopleList.FirstOrDefault(ev => ev.Id == id);
+            if (dbEventPeople == null)
+            {
+                return NotFound("EventPeople not found");
+            }
+
+            dbEventPeople.EventId = e.EventId;
+            dbEventPeople.PersonId = e.PersonId;
+
+            _context.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+        var eventPeopleToDelete = _context.EventPeopleList?.Find(id);
+        if (eventPeopleToDelete == null) return NotFound();
+        _context.EventPeopleList.Remove(eventPeopleToDelete);
+        _context.SaveChanges();
         return NoContent();
-    }
-    [HttpDelete("{id}")] public IActionResult Delete(int id) {
-        var EventPeopleToDelete = context.EventPeopleList?.Find(id);
-        if (EventPeopleToDelete == null) return NotFound();
-        context.EventPeopleList?.Remove(EventPeopleToDelete);
-        context.SaveChanges();
-        return NoContent();
+        }
     }
 }
-

@@ -68,5 +68,23 @@ public class DataContext: DbContext {
                 Attendance = true,
             }
         );
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<People>().Property(p => p.Id).HasIdentityOptions(startValue: 1);
+        modelBuilder.Entity<People>().HasData(
+            new People{
+            Id = 1,
+            Username = "RASMUS",
+            Email = "rasmus.lol@gmail.com",
+            }
+        );
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<EventPeople>().Property(p => p.Id).HasIdentityOptions(startValue: 1);
+        modelBuilder.Entity<EventPeople>().HasData(
+            new EventPeople{
+            Id = 1,
+            EventId = 1,
+            PersonId = 1,
+            }
+        );
     }
 }
