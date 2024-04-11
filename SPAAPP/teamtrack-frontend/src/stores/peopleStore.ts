@@ -1,12 +1,12 @@
-import { Event } from "@/models/event";
+import { People } from "@/models/peopleStore";
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import useApi, { useApiRawRequest } from "@/models/api";
 
-export const useEventsStore = defineStore('eventsStore', () => {
-  const apiGetEvents = useApi<Event[]>('events');
-  const events = ref<Event[]>([]);
-  let allEvents: Event[] = [];
+export const usePeopleStore = defineStore('peopleStore', () => {
+  const apiGetEvents = useApi<People[]>('people');
+  const events = ref<People[]>([]);
+  let allEvents: People[] = [];
 
   const loadEvents = async () => {
     await apiGetEvents.request();
@@ -26,8 +26,8 @@ export const useEventsStore = defineStore('eventsStore', () => {
   };
 
 
-  const addEvent = async (event: Event) => {
-    const apiAddEvent = useApi<Event>('events', {
+  const addEvent = async (event: People) => {
+    const apiAddEvent = useApi<People>('events', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -41,8 +41,8 @@ export const useEventsStore = defineStore('eventsStore', () => {
       load();      
     }
   };
-  const updateEvent = async (event: Event) => {
-    const apiUpdateEvent = useApi<Event>('events/' + event.id, {
+  const updateEvent = async (event: People) => {
+    const apiUpdateEvent = useApi<People>('events/' + event.id, {
       method: 'PUT',
       headers: {
         Accept: 'application/json',
@@ -58,7 +58,7 @@ export const useEventsStore = defineStore('eventsStore', () => {
   };
 
 
-  const deleteEvent = async (event: Event) => {
+  const deleteEvent = async (event: People) => {
     const deleteEventRequest = useApiRawRequest(`events/${event.id}`, {
       method: 'DELETE',
     });
